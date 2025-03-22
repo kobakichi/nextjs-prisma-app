@@ -64,3 +64,42 @@ export async function PUT(
     );
   }
 }
+
+// ユーザー削除処理
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = parseInt(params.id, 10);
+    if (isNaN(id)) {
+      return NextResponse.json({ error: "無効なIDです" }, { status: 400 });
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!existingUser) {
+      return NextResponse.json(
+        { error: "ユーザーが見つかりません" },
+        { status: 404 }
+      );
+    }
+
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(
+      { message: "ユーザーを削除しました" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("ユーザー削除エラー:", error);
+    return NextResponse.json(
+      { error: "サーバーエラーが発生しました" },
+      { status: 500 }
+    );
+  }
+}
