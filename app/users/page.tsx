@@ -91,6 +91,7 @@ export default function UsersPage() {
     e.preventDefault();
     if (!validateForm()) return;
 
+    setIsSubmitting(true); // 送信開始時にtrueに設定
     try {
       if (selectedUserId === null) {
         // 新規追加処理
@@ -111,10 +112,14 @@ export default function UsersPage() {
 
       setName("");
       setEmail("");
-
       await fetchUsers(); // データ再取得
     } catch (error) {
       console.error("送信エラー:", error);
+      setError(
+        error instanceof Error ? error.message : "送信中にエラーが発生しました"
+      );
+    } finally {
+      setIsSubmitting(false); // 処理完了時（成功・エラー問わず）にfalseに設定
     }
   };
 
